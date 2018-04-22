@@ -2,8 +2,10 @@ package nl.utwente.ing.testing.helper;
 
 import io.restassured.http.ContentType;
 import nl.utwente.ing.testing.bean.Category;
+import nl.utwente.ing.testing.bean.CategoryRule;
 import nl.utwente.ing.testing.bean.Transaction;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +47,31 @@ public class Helper {
         given().header("X-session-ID", sessionID).
                 contentType("application/json").body(categoryIDMap).
                 patch(Constants.PREFIX + "/transactions/" + transactionID + "/category");
+    }
+
+    public static Long postCategoryRule(String sessionID, CategoryRule categoryRule) {
+        String responseString = given().contentType("application/json").
+                body(categoryRule).header("X-session-ID", sessionID).
+                post(Constants.PREFIX + "/categoryRules").
+                then().contentType(ContentType.JSON).extract().response().asString();
+        Map<String, ?> responseMap = from(responseString).get("");
+        return new Long((Integer) responseMap.get("id"));
+    }
+
+    public static ArrayList<Long> filterOnCategory(String sessionID, Category category) {
+        ArrayList<Long> transactionIDs = new ArrayList<>();
+
+        String responseString = given().header("X-session-ID", sessionID).
+                queryParam("category", category.getName()).
+                get(Constants.PREFIX + "/transactions").
+                then().statusCode(200).contentType(ContentType.JSON).extract().response().asString();
+        ArrayList<Map<String, ?>> responseList = from(responseString).get("");
+
+        for (Map<String, ?> transactionMap : responseList) {
+            transactionIDs.add(new Long((Integer) transactionMap.get("id")));
+        }
+
+        return transactionIDs;
     }
 
 }
