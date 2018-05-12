@@ -1,13 +1,13 @@
-package nl.utwente.ing.testing;
+package nl.utwente.ing.testing.schemas;
 
 import nl.utwente.ing.testing.bean.Category;
 import nl.utwente.ing.testing.bean.Transaction;
+import nl.utwente.ing.testing.helper.Helper;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static io.restassured.RestAssured.*;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
-import static nl.utwente.ing.testing.InitialSystemTest.*;
 
 
 public class SchemaTest {
@@ -28,13 +28,13 @@ public class SchemaTest {
         Transaction transaction_2 = new Transaction("2016-04-13T08:06:10.000Z",
                 200, "NL02RABO0300065264", "withdrawal");
 
-        sessionID = getNewSessionID();
-        transaction_1_ID = postTransaction(sessionID, transaction_1);
-        transaction_2_ID = postTransaction(sessionID, transaction_2);
-        category_1_ID = postCategory(sessionID, category_1);
-        getCategory_2_ID = postCategory(sessionID, category_2);
-        assignCategoryToTransaction(sessionID,transaction_1_ID,category_1_ID);
-        assignCategoryToTransaction(sessionID, transaction_2_ID, getCategory_2_ID);
+        sessionID = Helper.getNewSessionID();
+        transaction_1_ID = Helper.postTransaction(sessionID, transaction_1);
+        transaction_2_ID = Helper.postTransaction(sessionID, transaction_2);
+        category_1_ID = Helper.postCategory(sessionID, category_1);
+        getCategory_2_ID = Helper.postCategory(sessionID, category_2);
+        Helper.assignCategoryToTransaction(sessionID,transaction_1_ID,category_1_ID);
+        Helper.assignCategoryToTransaction(sessionID, transaction_2_ID, getCategory_2_ID);
 
     }
 
