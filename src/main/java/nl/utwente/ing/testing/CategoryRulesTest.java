@@ -1,5 +1,6 @@
 package nl.utwente.ing.testing;
 
+import io.restassured.http.ContentType;
 import nl.utwente.ing.testing.bean.Category;
 import nl.utwente.ing.testing.bean.CategoryRule;
 import nl.utwente.ing.testing.bean.Transaction;
@@ -9,13 +10,49 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.when;
+import static io.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
 
 public class CategoryRulesTest {
+
+    @Test
+    public void testGetCategoryRules() {
+        // Test invalid session ID status code
+        when().get(Constants.PREFIX + "/categoryRules").then().statusCode(401);
+        given().header("X-session-ID", "A1B2C3D4E5").get(Constants.PREFIX + "/categoryRules").then().statusCode(401);
+
+        // Test responses and status codes
+        String newSessionID = Helper.getNewSessionID();
+        ArrayList<CategoryRule> categoryRules = new ArrayList<>();
+        categoryRules.add(new CategoryRule("strawberry", "NL66ABNA0123456789", "deposit", 1, false));
+        categoryRules.add(new CategoryRule("blueberry", "NL67ABNA0123456789", "deposit", 2, false));
+        categoryRules.add(new CategoryRule("raspberry", "NL68ABNA0123456789", "deposit", 3, false));
+        categoryRules.add(new CategoryRule("", "NL69ABNA0123456789", "withdrawal", 4, true));
+        for (CategoryRule categoryRule : categoryRules) {
+            Helper.postCategoryRule(newSessionID, categoryRule);
+        }
+
+        String responseString = given().header("X-session-ID", newSessionID).
+                get(Constants.PREFIX + "/categoryRules").
+                then().statusCode(200).contentType(ContentType.JSON).extract().response().asString();
+        ArrayList<Map<String, ?>> responseList = from(responseString).get("");
+        assertThat(responseList.size(), equalTo(4));
+        for (int i = 0; i <  categoryRules.size(); i++) {
+            assertThat(responseList.get(i), hasKey("id"));
+            assertThat((String) responseList.get(i).get("description"), equalTo(categoryRules.get(i).getDescription()));
+            assertThat((String) responseList.get(i).get("iBAN"), equalTo(categoryRules.get(i).getiBAN()));
+            assertThat((String) responseList.get(i).get("type"), equalTo(categoryRules.get(i).getType()));
+            assertThat(new Long((Integer) responseList.get(i).get("category_id")), equalTo(categoryRules.get(i).getCategory_id()));
+            assertThat((Boolean) responseList.get(i).get("applyOnHistory"), equalTo(categoryRules.get(i).getApplyOnHistory()));
+        }
+    }
 
     @Test
     public void testPostCategoryRuleBasic() {
@@ -147,6 +184,78 @@ public class CategoryRulesTest {
         fetchedTransactionIDs = Helper.filterOnCategory(sessionID, categories.get(2));
         assertThat(fetchedTransactionIDs.size(), equalTo(1));
         assertThat(fetchedTransactionIDs.get(0), equalTo(transactionIDs.get(0)));
+    }
+
+    @Test
+    public void testGetCategoryRule() {
+        // Test invalid session ID status code
+        when().get(Constants.PREFIX + "/categoryRules/1").then().statusCode(401);
+        given().header("X-session-ID", "A1B2C3D4E5")
+                .get(Constants.PREFIX + "/categoryRules/1").then().statusCode(401);
+
+        // Create new session
+        String sessionID = Helper.getNewSessionID();
+
+        // Test invalid categoryRule ID status code
+        given().header("X-session-ID", sessionID).get(Constants.PREFIX + "/categoryRules/8381237").then().statusCode(404);
+
+        // Create new categoryRules
+        CategoryRule categoryRule1 =
+                new CategoryRule("strawberry", "NL66ABNA0123456789", "deposit", 1, false);
+        CategoryRule categoryRule2 =
+                new CategoryRule("", "", "withdrawal", 1, true);
+        long categoryRuleID1 = Helper.postCategoryRule(sessionID, categoryRule1);
+        long categoryRuleID2 = Helper.postCategoryRule(sessionID, categoryRule2);
+
+        // Test valid categoryRule response and status code
+        given().header("X-session-ID", sessionID).
+                get(Constants.PREFIX + "/categoryRules/" + categoryRuleID1).
+                then().statusCode(200).
+                body("id", equalTo((int) categoryRuleID1)).
+                body("description", equalTo("strawberry")).
+                body("iBAN", equalTo("NL66ABNA0123456789")).
+                body("type", equalTo("deposit")).
+                body("category_id", equalTo(1)).
+                body("applyOnHistory", equalTo(false));
+        given().header("X-session-ID", sessionID).
+                get(Constants.PREFIX + "/categoryRules/" + categoryRuleID2).
+                then().statusCode(200).
+                body("id", equalTo((int) categoryRuleID2)).
+                body("description", equalTo("")).
+                body("iBAN", equalTo("")).
+                body("type", equalTo("withdrawal")).
+                body("category_id", equalTo(1)).
+                body("applyOnHistory", equalTo(true));
+    }
+
+    @Test
+    public void testPutCategoryRuleBasic() {
+        //TODO
+    }
+
+    @Test
+    public void testPutCategoryRuleNewTransaction() {
+        //TODO
+    }
+
+    @Test
+    public void testDeleteCategoryRuleBasic() {
+        //TODO
+    }
+
+    @Test
+    public void testDeleteCategoryRuleNewTransaction() {
+        //TODO
+    }
+
+    @Test
+    public void testApplyOnHistoryTrue() {
+        //TODO
+    }
+
+    @Test
+    public void testApplyOnHistoryFalse() {
+        //TODO
     }
 
 }
