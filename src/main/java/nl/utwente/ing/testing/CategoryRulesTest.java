@@ -6,7 +6,7 @@ import nl.utwente.ing.testing.bean.CategoryRule;
 import nl.utwente.ing.testing.bean.CategoryRuleWithoutApplyOnHistory;
 import nl.utwente.ing.testing.bean.Transaction;
 import nl.utwente.ing.testing.helper.Constants;
-import nl.utwente.ing.testing.helper.Helper;
+import nl.utwente.ing.testing.helper.RequestHelper;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -28,14 +28,14 @@ public class CategoryRulesTest {
         given().header("X-session-ID", "A1B2C3D4E5").get(Constants.PREFIX + "/categoryRules").then().statusCode(401);
 
         // Test responses and status codes
-        String newSessionID = Helper.getNewSessionID();
+        String newSessionID = RequestHelper.getNewSessionID();
         ArrayList<CategoryRule> categoryRules = new ArrayList<>();
         categoryRules.add(new CategoryRule("strawberry", "NL66ABNA0123456789", "deposit", 1, false));
         categoryRules.add(new CategoryRule("blueberry", "NL67ABNA0123456789", "deposit", 2, false));
         categoryRules.add(new CategoryRule("raspberry", "NL68ABNA0123456789", "deposit", 3, false));
         categoryRules.add(new CategoryRule("", "NL69ABNA0123456789", "withdrawal", 4, true));
         for (CategoryRule categoryRule : categoryRules) {
-            Helper.postCategoryRule(newSessionID, categoryRule);
+            RequestHelper.postCategoryRule(newSessionID, categoryRule);
         }
 
         String responseString = given().header("X-session-ID", newSessionID).
@@ -55,7 +55,7 @@ public class CategoryRulesTest {
 
     @Test
     public void testPostCategoryRuleBasic() {
-        String sessionID = Helper.getNewSessionID();
+        String sessionID = RequestHelper.getNewSessionID();
 
         CategoryRule categoryRule =
                 new CategoryRule("description", "iban", "withdrawal", 1, false);
@@ -124,7 +124,7 @@ public class CategoryRulesTest {
 
     @Test
     public void testPostCategoryRuleNewTransaction() {
-        String sessionID = Helper.getNewSessionID();
+        String sessionID = RequestHelper.getNewSessionID();
 
         // Create categories
         ArrayList<Category> categories = new ArrayList<>();
@@ -134,20 +134,20 @@ public class CategoryRulesTest {
 
         ArrayList<Long> categoryIDs = new ArrayList<>();
         for (Category category : categories) {
-            categoryIDs.add(Helper.postCategory(sessionID, category));
+            categoryIDs.add(RequestHelper.postCategory(sessionID, category));
         }
 
         // Create categoryRules
-        Helper.postCategoryRule(sessionID,
+        RequestHelper.postCategoryRule(sessionID,
                 new CategoryRule("", "", "deposit", 83818238, false));
         // The above rule should not be applied to any transaction, since there exists no category with id 83818238
-        Helper.postCategoryRule(sessionID,
+        RequestHelper.postCategoryRule(sessionID,
                 new CategoryRule("", "L43", "", categoryIDs.get(0), false));
-        Helper.postCategoryRule(sessionID,
+        RequestHelper.postCategoryRule(sessionID,
                 new CategoryRule("", "", "withdrawal", categoryIDs.get(1), false));
-        Helper.postCategoryRule(sessionID,
+        RequestHelper.postCategoryRule(sessionID,
                 new CategoryRule("abc", "", "", categoryIDs.get(2), false));
-        Helper.postCategoryRule(sessionID,
+        RequestHelper.postCategoryRule(sessionID,
                 new CategoryRule("", "ING", "", categoryIDs.get(0), false));
 
         // Create transactions
@@ -165,22 +165,22 @@ public class CategoryRulesTest {
 
         ArrayList<Long> transactionIDs = new ArrayList<>();
         for (Transaction transaction : transactions) {
-            transactionIDs.add(Helper.postTransaction(sessionID, transaction));
+            transactionIDs.add(RequestHelper.postTransaction(sessionID, transaction));
         }
 
         // Test whether the categories are correctly assigned
         ArrayList<Long> fetchedTransactionIDs;
 
-        fetchedTransactionIDs = Helper.filterOnCategory(sessionID, categories.get(0));
+        fetchedTransactionIDs = RequestHelper.filterOnCategory(sessionID, categories.get(0));
         assertThat(fetchedTransactionIDs.size(), equalTo(1));
         assertThat(fetchedTransactionIDs.get(0), equalTo(transactionIDs.get(4)));
 
-        fetchedTransactionIDs = Helper.filterOnCategory(sessionID, categories.get(1));
+        fetchedTransactionIDs = RequestHelper.filterOnCategory(sessionID, categories.get(1));
         assertThat(fetchedTransactionIDs.size(), equalTo(2));
         assertThat(fetchedTransactionIDs.get(0), equalTo(transactionIDs.get(1)));
         assertThat(fetchedTransactionIDs.get(1), equalTo(transactionIDs.get(3)));
 
-        fetchedTransactionIDs = Helper.filterOnCategory(sessionID, categories.get(2));
+        fetchedTransactionIDs = RequestHelper.filterOnCategory(sessionID, categories.get(2));
         assertThat(fetchedTransactionIDs.size(), equalTo(1));
         assertThat(fetchedTransactionIDs.get(0), equalTo(transactionIDs.get(0)));
     }
@@ -193,7 +193,7 @@ public class CategoryRulesTest {
                 .get(Constants.PREFIX + "/categoryRules/1").then().statusCode(401);
 
         // Create new session
-        String sessionID = Helper.getNewSessionID();
+        String sessionID = RequestHelper.getNewSessionID();
 
         // Test invalid categoryRule ID status code
         given().header("X-session-ID", sessionID).get(Constants.PREFIX + "/categoryRules/8381237").then().statusCode(404);
@@ -203,8 +203,8 @@ public class CategoryRulesTest {
                 new CategoryRule("strawberry", "NL66ABNA0123456789", "deposit", 1, false);
         CategoryRule categoryRule2 =
                 new CategoryRule("", "", "withdrawal", 1, true);
-        long categoryRuleID1 = Helper.postCategoryRule(sessionID, categoryRule1);
-        long categoryRuleID2 = Helper.postCategoryRule(sessionID, categoryRule2);
+        long categoryRuleID1 = RequestHelper.postCategoryRule(sessionID, categoryRule1);
+        long categoryRuleID2 = RequestHelper.postCategoryRule(sessionID, categoryRule2);
 
         // Test valid categoryRule response and status code
         given().header("X-session-ID", sessionID).
@@ -230,10 +230,10 @@ public class CategoryRulesTest {
     @Test
     public void testPutCategoryRuleBasic() {
         // Set up test
-        String sessionID = Helper.getNewSessionID();
+        String sessionID = RequestHelper.getNewSessionID();
         CategoryRule categoryRule =
                 new CategoryRule("description", "iban", "deposit", 1, false);
-        long categoryRuleID = Helper.postCategoryRule(sessionID, categoryRule);
+        long categoryRuleID = RequestHelper.postCategoryRule(sessionID, categoryRule);
         CategoryRuleWithoutApplyOnHistory newCategoryRule =
                 new CategoryRuleWithoutApplyOnHistory("noitpircsed", "nabi", "withdrawal", 2);
 
@@ -270,7 +270,7 @@ public class CategoryRulesTest {
 
     @Test
     public void testPutCategoryRuleNewTransaction() {
-        String sessionID = Helper.getNewSessionID();
+        String sessionID = RequestHelper.getNewSessionID();
 
         // Create categories
         ArrayList<Category> categories = new ArrayList<>();
@@ -280,20 +280,20 @@ public class CategoryRulesTest {
 
         ArrayList<Long> categoryIDs = new ArrayList<>();
         for (Category category : categories) {
-            categoryIDs.add(Helper.postCategory(sessionID, category));
+            categoryIDs.add(RequestHelper.postCategory(sessionID, category));
         }
 
         // Create categoryRules
-        long categoryRuleID1 = Helper.postCategoryRule(sessionID,
+        long categoryRuleID1 = RequestHelper.postCategoryRule(sessionID,
                 new CategoryRule("", "", "deposit", 83818238, false));
         // The above rule should not be applied to any transaction, since there exists no category with id 83818238
-        long categoryRuleID2 = Helper.postCategoryRule(sessionID,
+        long categoryRuleID2 = RequestHelper.postCategoryRule(sessionID,
                 new CategoryRule("", "L43", "", categoryIDs.get(0), false));
-        long categoryRuleID3 = Helper.postCategoryRule(sessionID,
+        long categoryRuleID3 = RequestHelper.postCategoryRule(sessionID,
                 new CategoryRule("", "", "withdrawal", categoryIDs.get(1), false));
-        long categoryRuleID4 = Helper.postCategoryRule(sessionID,
+        long categoryRuleID4 = RequestHelper.postCategoryRule(sessionID,
                 new CategoryRule("abc", "", "", categoryIDs.get(2), false));
-        long categoryRuleID5 = Helper.postCategoryRule(sessionID,
+        long categoryRuleID5 = RequestHelper.postCategoryRule(sessionID,
                 new CategoryRule("", "ING", "", categoryIDs.get(0), false));
 
         // Update categoryRules
@@ -333,21 +333,21 @@ public class CategoryRulesTest {
 
         ArrayList<Long> transactionIDs = new ArrayList<>();
         for (Transaction transaction : transactions) {
-            transactionIDs.add(Helper.postTransaction(sessionID, transaction));
+            transactionIDs.add(RequestHelper.postTransaction(sessionID, transaction));
         }
 
         // Test whether the categories are correctly assigned (by the updated categoryRules)
         ArrayList<Long> fetchedTransactionIDs;
 
-        fetchedTransactionIDs = Helper.filterOnCategory(sessionID, categories.get(0));
+        fetchedTransactionIDs = RequestHelper.filterOnCategory(sessionID, categories.get(0));
         assertThat(fetchedTransactionIDs.size(), equalTo(1));
         assertThat(fetchedTransactionIDs.get(0), equalTo(transactionIDs.get(2)));
 
-        fetchedTransactionIDs = Helper.filterOnCategory(sessionID, categories.get(1));
+        fetchedTransactionIDs = RequestHelper.filterOnCategory(sessionID, categories.get(1));
         assertThat(fetchedTransactionIDs.size(), equalTo(1));
         assertThat(fetchedTransactionIDs.get(0), equalTo(transactionIDs.get(4)));
 
-        fetchedTransactionIDs = Helper.filterOnCategory(sessionID, categories.get(2));
+        fetchedTransactionIDs = RequestHelper.filterOnCategory(sessionID, categories.get(2));
         assertThat(fetchedTransactionIDs.size(), equalTo(2));
         assertThat(fetchedTransactionIDs.get(0), equalTo(transactionIDs.get(1)));
         assertThat(fetchedTransactionIDs.get(1), equalTo(transactionIDs.get(3)));
@@ -360,13 +360,13 @@ public class CategoryRulesTest {
         given().header("X-session-ID", "A1B2C3D4E5").delete(Constants.PREFIX + "/categoryRules/1").then().statusCode(401);
 
         // Test invalid categoryRuleID status code
-        String sessionID = Helper.getNewSessionID();
+        String sessionID = RequestHelper.getNewSessionID();
         given().header("X-session-ID", sessionID).delete(Constants.PREFIX + "/categoryRules/8381237").then().statusCode(404);
 
         // Test valid categoryRule status code
         CategoryRule categoryRule =
                 new CategoryRule("strawberry", "NL66ABNA0123456789", "deposit", 1, false);
-        long categoryRuleID = Helper.postCategoryRule(sessionID, categoryRule);
+        long categoryRuleID = RequestHelper.postCategoryRule(sessionID, categoryRule);
         given().header("X-session-ID", sessionID).delete(Constants.PREFIX + "/categoryRules/" + categoryRuleID).
                 then().statusCode(204);
     }
@@ -374,22 +374,22 @@ public class CategoryRulesTest {
     @Test
     public void testDeleteCategoryRuleNewTransaction() {
         // Set up the test
-        String sessionID = Helper.getNewSessionID();
+        String sessionID = RequestHelper.getNewSessionID();
         Category category = new Category("Sugar");
-        long categoryID = Helper.postCategory(sessionID, category);
-        long categoryRuleID = Helper.postCategoryRule(sessionID,
+        long categoryID = RequestHelper.postCategory(sessionID, category);
+        long categoryRuleID = RequestHelper.postCategoryRule(sessionID,
                 new CategoryRule("cake", "", "", categoryID, false));
 
         /* First post a transaction to which the categoryRule applies, then delete the categoryRule, then post another
         transaction to which the categoryRule would apply, finally test that the category is only assigned to the first
         transaction. */
-        long transactionID1 = Helper.postTransaction(sessionID, new Transaction("2014-04-13T08:06:10.000Z",
+        long transactionID1 = RequestHelper.postTransaction(sessionID, new Transaction("2014-04-13T08:06:10.000Z",
                 20, "Birthday cake", "NL43RABO0300065264", "deposit"));
         given().header("X-session-ID", sessionID).delete(Constants.PREFIX + "/categoryRules/" + categoryRuleID);
-        long transactionID2 = Helper.postTransaction(sessionID, new Transaction("2014-04-13T08:06:17.000Z",
+        long transactionID2 = RequestHelper.postTransaction(sessionID, new Transaction("2014-04-13T08:06:17.000Z",
                 5, "Recipe to bake cake made of apples", "NL43RABO0300065264", "deposit"));
 
-        ArrayList<Long> fetchedTransactionIDs = Helper.filterOnCategory(sessionID, category);
+        ArrayList<Long> fetchedTransactionIDs = RequestHelper.filterOnCategory(sessionID, category);
         assertThat(fetchedTransactionIDs.size(), equalTo(1));
         assertThat(fetchedTransactionIDs.get(0), equalTo(transactionID1));
     }
@@ -397,41 +397,41 @@ public class CategoryRulesTest {
     @Test
     public void testApplyOnHistoryTrue() {
         // Set up the test
-        String sessionID = Helper.getNewSessionID();
+        String sessionID = RequestHelper.getNewSessionID();
         Category category1 = new Category("Sugar");
-        long categoryID1 = Helper.postCategory(sessionID, category1);
+        long categoryID1 = RequestHelper.postCategory(sessionID, category1);
         Category category2 = new Category("Vegetables");
-        long categoryID2 = Helper.postCategory(sessionID, category2);
+        long categoryID2 = RequestHelper.postCategory(sessionID, category2);
 
         /* First post transactions to which the categoryRule would apply, then post the categoryRule, finally test if
         the category is applied to the transactions. */
-        long transactionID1 = Helper.postTransaction(sessionID, new Transaction("2014-04-13T08:06:10.000Z",
+        long transactionID1 = RequestHelper.postTransaction(sessionID, new Transaction("2014-04-13T08:06:10.000Z",
                 20, "Birthday cake", "NL43RABO0300065264", "deposit"));
-        long transactionID2 = Helper.postTransaction(sessionID, new Transaction("2014-04-14T08:06:10.000Z",
+        long transactionID2 = RequestHelper.postTransaction(sessionID, new Transaction("2014-04-14T08:06:10.000Z",
                 1, "Healthy cake made of broccoli", "NL43RABO0300065264", "deposit"));
-        Helper.postCategoryRule(sessionID,
+        RequestHelper.postCategoryRule(sessionID,
                 new CategoryRule("cake", "", "", categoryID1, true));
 
-        ArrayList<Long> fetchedTransactionIDs = Helper.filterOnCategory(sessionID, category1);
+        ArrayList<Long> fetchedTransactionIDs = RequestHelper.filterOnCategory(sessionID, category1);
         assertThat(fetchedTransactionIDs.size(), equalTo(2));
         assertThat(fetchedTransactionIDs.get(0), equalTo(transactionID1));
         assertThat(fetchedTransactionIDs.get(1), equalTo(transactionID2));
 
         // Test that a categoryRule with an invalid categoryID is not applied on history
-        Helper.postCategoryRule(sessionID,
+        RequestHelper.postCategoryRule(sessionID,
                 new CategoryRule("", "", "deposit", 71371281, true));
-        fetchedTransactionIDs = Helper.filterOnCategory(sessionID, category1);
+        fetchedTransactionIDs = RequestHelper.filterOnCategory(sessionID, category1);
         assertThat(fetchedTransactionIDs.size(), equalTo(2));
         assertThat(fetchedTransactionIDs.get(0), equalTo(transactionID1));
         assertThat(fetchedTransactionIDs.get(1), equalTo(transactionID2));
 
         // Test whether a new categoryRule applied on history also applies to categories that already had a category
-        Helper.postCategoryRule(sessionID,
+        RequestHelper.postCategoryRule(sessionID,
                 new CategoryRule("broccoli", "", "", categoryID2, true));
-        fetchedTransactionIDs = Helper.filterOnCategory(sessionID, category1);
+        fetchedTransactionIDs = RequestHelper.filterOnCategory(sessionID, category1);
         assertThat(fetchedTransactionIDs.size(), equalTo(1));
         assertThat(fetchedTransactionIDs.get(0), equalTo(transactionID1));
-        fetchedTransactionIDs = Helper.filterOnCategory(sessionID, category2);
+        fetchedTransactionIDs = RequestHelper.filterOnCategory(sessionID, category2);
         assertThat(fetchedTransactionIDs.size(), equalTo(1));
         assertThat(fetchedTransactionIDs.get(0), equalTo(transactionID2));
     }
@@ -439,18 +439,18 @@ public class CategoryRulesTest {
     @Test
     public void testApplyOnHistoryFalse() {
         // Set up the test
-        String sessionID = Helper.getNewSessionID();
+        String sessionID = RequestHelper.getNewSessionID();
         Category category = new Category("Sugar");
-        long categoryID = Helper.postCategory(sessionID, category);
+        long categoryID = RequestHelper.postCategory(sessionID, category);
 
         /* First post a transaction, then post a categoryRule that would have applied to it, finally check that no
          * category is assigned to the transaction. */
-        long transactionID = Helper.postTransaction(sessionID, new Transaction("2014-04-13T08:06:10.000Z",
+        long transactionID = RequestHelper.postTransaction(sessionID, new Transaction("2014-04-13T08:06:10.000Z",
                 20, "Birthday cake", "NL43RABO0300065264", "deposit"));
-        Helper.postCategoryRule(sessionID,
+        RequestHelper.postCategoryRule(sessionID,
                 new CategoryRule("cake", "", "", categoryID, false));
 
-        ArrayList<Long> fetchedTransactionIDs = Helper.filterOnCategory(sessionID, category);
+        ArrayList<Long> fetchedTransactionIDs = RequestHelper.filterOnCategory(sessionID, category);
         assertThat(fetchedTransactionIDs.size(), equalTo(0));
     }
 

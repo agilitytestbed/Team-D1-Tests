@@ -3,7 +3,7 @@ package nl.utwente.ing.testing;
 import io.restassured.http.ContentType;
 import nl.utwente.ing.testing.bean.Category;
 import nl.utwente.ing.testing.bean.Transaction;
-import nl.utwente.ing.testing.helper.Helper;
+import nl.utwente.ing.testing.helper.RequestHelper;
 import nl.utwente.ing.testing.helper.Constants;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ public class InitialSystemTest {
 
     @BeforeAll
     public static void setup() {
-        sessionID = Helper.getNewSessionID();
+        sessionID = RequestHelper.getNewSessionID();
     }
 
     @Test
@@ -41,7 +41,7 @@ public class InitialSystemTest {
         given().header("X-session-ID", "A1B2C3D4E5").get(Constants.PREFIX + "/transactions").then().statusCode(401);
 
         // Test responses and status codes
-        String newSessionID = Helper.getNewSessionID();
+        String newSessionID = RequestHelper.getNewSessionID();
         ArrayList<Transaction> transactionList = new ArrayList<>();
         transactionList.add(new Transaction("2015-04-13T08:06:10.000Z",
                 100, "NL01RABO0300065264", "deposit"));
@@ -52,7 +52,7 @@ public class InitialSystemTest {
         transactionList.add(new Transaction("2018-04-13T08:06:10.000Z",
                 400, "NL04RABO0300065264", "withdrawal"));
         for (Transaction transaction : transactionList) {
-            Helper.postTransaction(newSessionID, transaction);
+            RequestHelper.postTransaction(newSessionID, transaction);
         }
 
         for (int i = 0; i < transactionList.size(); i++) {
@@ -123,7 +123,7 @@ public class InitialSystemTest {
         // Test valid transaction response and status code
         Transaction transaction = new Transaction("2018-04-13T08:06:10.000Z",
                 100, "NL39RABO0300065264", "deposit");
-        long transactionID = Helper.postTransaction(sessionID, transaction);
+        long transactionID = RequestHelper.postTransaction(sessionID, transaction);
         given().header("X-session-ID", sessionID).
                 get(Constants.PREFIX + "/transactions/" + transactionID).
                 then().statusCode(200).
@@ -152,7 +152,7 @@ public class InitialSystemTest {
                 put(Constants.PREFIX + "/transactions/8381237").then().statusCode(404);
 
         // Test valid transaction put response and status code
-        long transactionID = Helper.postTransaction(sessionID, transaction);
+        long transactionID = RequestHelper.postTransaction(sessionID, transaction);
         transaction.setDate("2013-04-13T08:06:10.000Z");
         transaction.setAmount(225);
         transaction.setExternalIBAN("NL02RABO0300065264");
@@ -186,7 +186,7 @@ public class InitialSystemTest {
         // Test valid transaction status code
         Transaction transaction = new Transaction("2018-04-13T08:06:10.000Z",
                 100, "NL39RABO0300065264", "deposit");
-        long transactionID = Helper.postTransaction(sessionID, transaction);
+        long transactionID = RequestHelper.postTransaction(sessionID, transaction);
         given().header("X-session-ID", sessionID).delete(Constants.PREFIX + "/transactions/" + transactionID).
                 then().statusCode(204);
     }
@@ -197,9 +197,9 @@ public class InitialSystemTest {
                 100, "NL39RABO0300065264", "deposit");
         Category category1 = new Category("Groceries");
         Category category2 = new Category("Rent");
-        long transactionID = Helper.postTransaction(sessionID, transaction);
-        long categoryID1 = Helper.postCategory(sessionID, category1);
-        long categoryID2 = Helper.postCategory(sessionID, category2);
+        long transactionID = RequestHelper.postTransaction(sessionID, transaction);
+        long categoryID1 = RequestHelper.postCategory(sessionID, category1);
+        long categoryID2 = RequestHelper.postCategory(sessionID, category2);
         Map<String, Long> categoryIDMap = new HashMap<>();
         categoryIDMap.put("category_id", categoryID1);
 
@@ -248,14 +248,14 @@ public class InitialSystemTest {
         given().header("X-session-ID", "A1B2C3D4E5").get(Constants.PREFIX + "/categories").then().statusCode(401);
 
         // Test responses and status codes
-        String newSessionID = Helper.getNewSessionID();
+        String newSessionID = RequestHelper.getNewSessionID();
         ArrayList<Category> categoryList = new ArrayList<>();
         categoryList.add(new Category("Groceries"));
         categoryList.add(new Category("Rent"));
         categoryList.add(new Category("Entertainment"));
         categoryList.add(new Category("Salary"));
         for (Category category : categoryList) {
-            Helper.postCategory(newSessionID, category);
+            RequestHelper.postCategory(newSessionID, category);
         }
 
         for (int i = 0; i < categoryList.size(); i++) {
@@ -315,7 +315,7 @@ public class InitialSystemTest {
 
         // Test valid category response and status code
         Category category = new Category("Groceries");
-        long categoryID = Helper.postCategory(sessionID, category);
+        long categoryID = RequestHelper.postCategory(sessionID, category);
         given().header("X-session-ID", sessionID).
                 get(Constants.PREFIX + "/categories/" + categoryID).
                 then().statusCode(200).
@@ -339,7 +339,7 @@ public class InitialSystemTest {
                 put(Constants.PREFIX + "/categories/8381237").then().statusCode(404);
 
         // Test valid category put response and status code
-        long categoryID = Helper.postCategory(sessionID, category);
+        long categoryID = RequestHelper.postCategory(sessionID, category);
         category.setName("Rent");
         given().contentType("application/json").
                 body(category).header("X-session-ID", sessionID).
@@ -366,7 +366,7 @@ public class InitialSystemTest {
 
         // Test valid category status code
         Category category = new Category("Groceries");
-        long categoryID = Helper.postCategory(sessionID, category);
+        long categoryID = RequestHelper.postCategory(sessionID, category);
         given().header("X-session-ID", sessionID).delete(Constants.PREFIX + "/categories/" + categoryID).
                 then().statusCode(204);
     }
@@ -377,10 +377,10 @@ public class InitialSystemTest {
         Transaction transaction = new Transaction("2018-04-13T08:06:10.000Z",
                 100, "NL39RABO0300065264", "deposit");
         Category category = new Category("Groceries");
-        String newSessionID = Helper.getNewSessionID();
-        long transactionID = Helper.postTransaction(newSessionID, transaction);
-        long categoryID = Helper.postCategory(newSessionID, category);
-        Helper.assignCategoryToTransaction(newSessionID, transactionID, categoryID);
+        String newSessionID = RequestHelper.getNewSessionID();
+        long transactionID = RequestHelper.postTransaction(newSessionID, transaction);
+        long categoryID = RequestHelper.postCategory(newSessionID, category);
+        RequestHelper.assignCategoryToTransaction(newSessionID, transactionID, categoryID);
         String responseString = given().header("X-session-ID", newSessionID).get(Constants.PREFIX + "/transactions").
                 then().statusCode(200).
                 contentType(ContentType.JSON).extract().response().asString();
@@ -400,9 +400,9 @@ public class InitialSystemTest {
         Transaction transaction = new Transaction("2018-04-13T08:06:10.000Z",
                 100, "NL39RABO0300065264", "deposit");
         Category category = new Category("Groceries");
-        long transactionID = Helper.postTransaction(sessionID, transaction);
-        long categoryID = Helper.postCategory(sessionID, category);
-        Helper.assignCategoryToTransaction(sessionID, transactionID, categoryID);
+        long transactionID = RequestHelper.postTransaction(sessionID, transaction);
+        long categoryID = RequestHelper.postCategory(sessionID, category);
+        RequestHelper.assignCategoryToTransaction(sessionID, transactionID, categoryID);
         String responseString = given().header("X-session-ID", sessionID).
                 get(Constants.PREFIX + "/transactions/" + transactionID).
                 then().statusCode(200).
@@ -423,9 +423,9 @@ public class InitialSystemTest {
         Transaction transaction = new Transaction("2018-04-13T08:06:10.000Z",
                 100, "NL39RABO0300065264", "deposit");
         Category category = new Category("Groceries");
-        long transactionID = Helper.postTransaction(sessionID, transaction);
-        long categoryID = Helper.postCategory(sessionID, category);
-        Helper.assignCategoryToTransaction(sessionID, transactionID, categoryID);
+        long transactionID = RequestHelper.postTransaction(sessionID, transaction);
+        long categoryID = RequestHelper.postCategory(sessionID, category);
+        RequestHelper.assignCategoryToTransaction(sessionID, transactionID, categoryID);
         String responseString = given().header("X-session-ID", sessionID).
                 contentType("application/json").body(transaction).
                 put(Constants.PREFIX + "/transactions/" + transactionID).
@@ -455,15 +455,15 @@ public class InitialSystemTest {
                 300, "NL03RABO0300065264", "deposit"));
         transactionList.add(new Transaction("2018-04-13T08:06:10.000Z",
                 400, "NL04RABO0300065264", "withdrawal"));
-        String newSessionID = Helper.getNewSessionID();
-        long categoryID1 = Helper.postCategory(newSessionID, category1);
-        long categoryID2 = Helper.postCategory(newSessionID, category2);
+        String newSessionID = RequestHelper.getNewSessionID();
+        long categoryID1 = RequestHelper.postCategory(newSessionID, category1);
+        long categoryID2 = RequestHelper.postCategory(newSessionID, category2);
         for (Transaction transaction : transactionList) {
-            long transactionID = Helper.postTransaction(newSessionID, transaction);
+            long transactionID = RequestHelper.postTransaction(newSessionID, transaction);
             if (transactionID % 2 == 1) {
-                Helper.assignCategoryToTransaction(newSessionID, transactionID, categoryID1);
+                RequestHelper.assignCategoryToTransaction(newSessionID, transactionID, categoryID1);
             } else {
-                Helper.assignCategoryToTransaction(newSessionID, transactionID, categoryID2);
+                RequestHelper.assignCategoryToTransaction(newSessionID, transactionID, categoryID2);
             }
         }
 
