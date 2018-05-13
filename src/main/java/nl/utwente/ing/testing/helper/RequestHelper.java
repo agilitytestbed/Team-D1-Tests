@@ -13,7 +13,7 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static io.restassured.path.json.JsonPath.from;
 
-public class Helper {
+public class RequestHelper {
 
     public static String getNewSessionID() {
         String responseString = when().post(Constants.PREFIX + "/sessions").
