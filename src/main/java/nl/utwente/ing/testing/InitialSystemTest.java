@@ -5,8 +5,8 @@ import nl.utwente.ing.testing.bean.Category;
 import nl.utwente.ing.testing.bean.Transaction;
 import nl.utwente.ing.testing.helper.RequestHelper;
 import nl.utwente.ing.testing.helper.Constants;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +21,7 @@ public class InitialSystemTest {
 
     public static String sessionID;
 
-    @BeforeAll
+    @BeforeClass
     public static void setup() {
         sessionID = RequestHelper.getNewSessionID();
     }

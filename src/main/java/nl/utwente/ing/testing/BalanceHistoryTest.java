@@ -5,7 +5,7 @@ import nl.utwente.ing.testing.bean.Transaction;
 import nl.utwente.ing.testing.helper.Constants;
 import nl.utwente.ing.testing.helper.IntervalHelper;
 import nl.utwente.ing.testing.helper.RequestHelper;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
