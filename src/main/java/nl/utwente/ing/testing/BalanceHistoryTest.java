@@ -8,6 +8,7 @@ import nl.utwente.ing.testing.helper.RequestHelper;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public class BalanceHistoryTest {
         String sessionID = RequestHelper.getNewSessionID();
 
         // Test valid application workflow
-        LocalDateTime localDateTime = LocalDateTime.now().minusHours(1);
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusHours(1);
         localDateTime = localDateTime.minusMonths(24);
         ArrayList<Transaction> transactions = new ArrayList<>();
 
@@ -98,7 +99,7 @@ public class BalanceHistoryTest {
         String sessionID = RequestHelper.getNewSessionID();
 
         // Test valid application workflow
-        LocalDateTime localDateTime = LocalDateTime.now().minusHours(1);
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusHours(1);
         localDateTime = localDateTime.minusMonths(1);
         ArrayList<Transaction> transactions = new ArrayList<>();
 
@@ -147,7 +148,7 @@ public class BalanceHistoryTest {
         String sessionID = RequestHelper.getNewSessionID();
 
         // Test valid application workflow
-        LocalDateTime localDateTime = LocalDateTime.now().minusWeeks(1);
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusWeeks(1);
         localDateTime = localDateTime.minusMonths(3);
         ArrayList<Transaction> transactions = new ArrayList<>();
 
@@ -205,7 +206,7 @@ public class BalanceHistoryTest {
         String sessionID = RequestHelper.getNewSessionID();
 
         // Test valid application workflow
-        LocalDateTime localDateTime = LocalDateTime.now().minusMinutes(1);
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(1);
         localDateTime = localDateTime.minusHours(4);
         ArrayList<Transaction> transactions = new ArrayList<>();
 
@@ -243,7 +244,7 @@ public class BalanceHistoryTest {
         String sessionID = RequestHelper.getNewSessionID();
 
         // Test valid application workflow
-        LocalDateTime localDateTime = LocalDateTime.now().minusMinutes(1);
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(1);
         localDateTime = localDateTime.minusDays(4);
         ArrayList<Transaction> transactions = new ArrayList<>();
 
@@ -281,7 +282,7 @@ public class BalanceHistoryTest {
         String sessionID = RequestHelper.getNewSessionID();
 
         // Test valid application workflow
-        LocalDateTime localDateTime = LocalDateTime.now().minusMinutes(1);
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(1);
         localDateTime = localDateTime.minusWeeks(4);
         ArrayList<Transaction> transactions = new ArrayList<>();
 
@@ -319,7 +320,7 @@ public class BalanceHistoryTest {
         String sessionID = RequestHelper.getNewSessionID();
 
         // Test valid application workflow
-        LocalDateTime localDateTime = LocalDateTime.now().minusMinutes(1);
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(1);
         localDateTime = localDateTime.minusMonths(4);
         ArrayList<Transaction> transactions = new ArrayList<>();
 
@@ -357,7 +358,7 @@ public class BalanceHistoryTest {
         String sessionID = RequestHelper.getNewSessionID();
 
         // Test valid application workflow
-        LocalDateTime localDateTime = LocalDateTime.now().minusMinutes(1);
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(1);
         localDateTime = localDateTime.minusYears(4);
         ArrayList<Transaction> transactions = new ArrayList<>();
 
