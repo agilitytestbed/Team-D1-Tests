@@ -8,7 +8,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
         InitialSystemTest.class,
         CategoryRulesTest.class,
-        BalanceHistoryTest.class
+        BalanceHistoryTest.class,
+        SavingGoalsTest.class
 })
 public class TestSuite {
 
