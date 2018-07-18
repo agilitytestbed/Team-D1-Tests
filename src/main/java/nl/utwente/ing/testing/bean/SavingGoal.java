@@ -11,7 +11,6 @@ import nl.utwente.ing.testing.helper.IntervalHelper;
  */
 public class SavingGoal {
 
-    private String creationDate;
     private String name;
     private float goal;
     private float savePerMonth;
@@ -26,32 +25,11 @@ public class SavingGoal {
 
     }
 
-    public SavingGoal(String creationDate, String name, float goal, float savePerMonth, float minBalanceRequired) {
-        this.creationDate = creationDate;
+    public SavingGoal(String name, float goal, float savePerMonth, float minBalanceRequired) {
         this.name = name;
         this.goal = goal;
         this.savePerMonth = savePerMonth;
         this.minBalanceRequired = minBalanceRequired;
-    }
-
-    /**
-     * Method used to retrieve the CreationDate of SavingGoal.
-     * Ignored by the REST Controller.
-     *
-     * @return The CreationDate of SavingGoal.
-     */
-    @JsonIgnore
-    public String getCreationDate() {
-        return creationDate;
-    }
-
-    /**
-     * Method used to update the CreationDate of SavingGoal.
-     *
-     * @param creationDate The new CreationDate of SavingGoal.
-     */
-    public void setCreationDate(String creationDate) {
-        this.creationDate = creationDate;
     }
 
     /**
@@ -136,26 +114,12 @@ public class SavingGoal {
     }
 
     /**
-     * Method used to put aside one month worth of savings as long as the goal is not met.
+     * Method used to update the Balance of SavingGoal.
      *
-     * @return The amount put aside by this method call.
+     * @param balance The new balance of SavingGoal.
      */
-    public float setApart() {
-        float leftToSave = goal - balance;
-        float saved = Math.min(leftToSave, savePerMonth);
-        balance += saved;
-        return saved;
-    }
-
-    /**
-     * Method used to retrieve the month identifier of the creation date of SavingGoal.
-     * Ignored by the REST Controller.
-     *
-     * @return The month identifier of the creation date of SavingGoal.
-     */
-    @JsonIgnore
-    public int getMonthIdentifier() {
-        return IntervalHelper.getMonthIdentifier(creationDate);
+    public void setBalance(float balance) {
+        this.balance = balance;
     }
 
 }

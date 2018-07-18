@@ -29,14 +29,10 @@ public class SavingGoalsTest {
         // Test responses and status codes
         String newSessionID = RequestHelper.getNewSessionID();
         ArrayList<SavingGoal> savingGoals = new ArrayList<>();
-        savingGoals.add(new SavingGoal(null,
-                "Holiday", 1000, 85, 100));
-        savingGoals.add(new SavingGoal(null,
-                "Car", 2500, 250, 500));
-        savingGoals.add(new SavingGoal(null,
-                "PC", 800, 100, 100));
-        savingGoals.add(new SavingGoal(null,
-                "House", 300000, 5, 10));
+        savingGoals.add(new SavingGoal("Holiday", 1000, 85, 100));
+        savingGoals.add(new SavingGoal("Car", 2500, 250, 500));
+        savingGoals.add(new SavingGoal("PC", 800, 100, 100));
+        savingGoals.add(new SavingGoal("House", 300000, 5, 10));
         for (SavingGoal savingGoal : savingGoals) {
             RequestHelper.postSavingGoal(newSessionID, savingGoal);
         }
@@ -59,8 +55,7 @@ public class SavingGoalsTest {
     @Test
     public void testPostSavingGoalBasic() {
         String sessionID = RequestHelper.getNewSessionID();
-        SavingGoal savingGoal = new SavingGoal(null,
-                "Holiday", 1000, 95, 100);
+        SavingGoal savingGoal = new SavingGoal("Holiday", 1000, 95, 100);
 
 //        ArrayList<Transaction> transactions = new ArrayList<>();
 //        transactions.add(new Transaction("2018-07-16T07:30:18.028Z",
@@ -112,11 +107,15 @@ public class SavingGoalsTest {
         given().header("X-session-ID", sessionID).delete(Constants.PREFIX + "/savingGoals/8381237").then().statusCode(404);
 
         // Test valid savingGoal status code
-        SavingGoal savingGoal = new SavingGoal(null,
-                "Holiday", 1000, 100, 100);
+        SavingGoal savingGoal = new SavingGoal("Holiday", 1000, 100, 100);
         long savingGoalID = RequestHelper.postSavingGoal(sessionID, savingGoal);
         given().header("X-session-ID", sessionID).delete(Constants.PREFIX + "/savingGoals/" + savingGoalID).
                 then().statusCode(204);
+    }
+
+    @Test
+    public void testSavingGoalsCorrectBalance() {
+
     }
 
 }
