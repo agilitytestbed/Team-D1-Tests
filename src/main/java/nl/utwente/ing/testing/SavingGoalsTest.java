@@ -115,7 +115,176 @@ public class SavingGoalsTest {
 
     @Test
     public void testSavingGoalsCorrectBalance() {
+        String sessionID = RequestHelper.getNewSessionID();
 
+        // JAN 2018
+        // Starting balance: 0
+        // Saving goals: PC = 0
+        RequestHelper.postTransaction(sessionID, new Transaction(
+                "2018-01-18T07:30:18.028Z", 99, "NL00INGB0123456789", "deposit"));
+        long pcSavingGoalID = RequestHelper.postSavingGoal(sessionID, new SavingGoal(
+                "PC", 590, 100, 100));
+
+        // Check for correct Saving Goals
+        String responseString = given().header("X-session-ID", sessionID).
+                get(Constants.PREFIX + "/savingGoals").
+                then().contentType(ContentType.JSON).extract().response().asString();
+        ArrayList<Map<String, ?>> responseList = from(responseString).get("");
+        assertThat(responseList.size(), equalTo(1));
+        assertThat(responseList.get(0).get("id"), equalTo((int) pcSavingGoalID));
+        assertThat(responseList.get(0).get("balance"), equalTo((float) 0));
+
+        // FEB 2018
+        // Starting balance: 99
+        // Saving goals: PC = 0, Car = 0
+        RequestHelper.postTransaction(sessionID, new Transaction(
+                "2018-02-18T07:30:18.028Z", 100, "NL00INGB0123456789", "deposit"));
+        long carSavingGoalID = RequestHelper.postSavingGoal(sessionID, new SavingGoal(
+                "Car", 2500, 250, 500));
+
+        // Check for correct Saving Goals
+        responseString = given().header("X-session-ID", sessionID).
+                get(Constants.PREFIX + "/savingGoals").
+                then().contentType(ContentType.JSON).extract().response().asString();
+        responseList = from(responseString).get("");
+        assertThat(responseList.size(), equalTo(2));
+        assertThat(responseList.get(0).get("id"), equalTo((int) pcSavingGoalID));
+        assertThat(responseList.get(0).get("balance"), equalTo((float) 0));
+        assertThat(responseList.get(1).get("id"), equalTo((int) carSavingGoalID));
+        assertThat(responseList.get(1).get("balance"), equalTo((float) 0));
+
+        // MAR 2018
+        // Starting balance: 199 - 100 = 99
+        // Saving goals: PC = 100, Car = 0
+        RequestHelper.postTransaction(sessionID, new Transaction(
+                "2018-03-18T07:30:18.028Z", 500, "NL00INGB0123456789", "deposit"));
+
+        // Check for correct Saving Goals
+        responseString = given().header("X-session-ID", sessionID).
+                get(Constants.PREFIX + "/savingGoals").
+                then().contentType(ContentType.JSON).extract().response().asString();
+        responseList = from(responseString).get("");
+        assertThat(responseList.size(), equalTo(2));
+        assertThat(responseList.get(0).get("id"), equalTo((int) pcSavingGoalID));
+        assertThat(responseList.get(0).get("balance"), equalTo((float) 100));
+        assertThat(responseList.get(1).get("id"), equalTo((int) carSavingGoalID));
+        assertThat(responseList.get(1).get("balance"), equalTo((float) 0));
+
+        // APR 2018
+        // Starting balance: 599 - 100 = 499
+        // Saving goals: PC = 200, Car = 0, Holiday = 0
+        RequestHelper.postTransaction(sessionID, new Transaction(
+                "2018-04-18T07:30:18.028Z", 100, "NL00INGB0123456789", "deposit"));
+        long holidaySavingGoalID = RequestHelper.postSavingGoal(sessionID, new SavingGoal(
+                "Holiday", 1000, 85, 90));
+
+        // Check for correct Saving Goals
+        responseString = given().header("X-session-ID", sessionID).
+                get(Constants.PREFIX + "/savingGoals").
+                then().contentType(ContentType.JSON).extract().response().asString();
+        responseList = from(responseString).get("");
+        assertThat(responseList.size(), equalTo(3));
+        assertThat(responseList.get(0).get("id"), equalTo((int) pcSavingGoalID));
+        assertThat(responseList.get(0).get("balance"), equalTo((float) 200));
+        assertThat(responseList.get(1).get("id"), equalTo((int) carSavingGoalID));
+        assertThat(responseList.get(1).get("balance"), equalTo((float) 0));
+        assertThat(responseList.get(2).get("id"), equalTo((int) holidaySavingGoalID));
+        assertThat(responseList.get(2).get("balance"), equalTo((float) 0));
+
+        // MAY 2018
+        // Starting balance: 599 - 100 - 85 = 414
+        // Saving goals: PC = 300, Car = 0, Holiday = 85
+        RequestHelper.postTransaction(sessionID, new Transaction(
+                "2018-05-18T07:30:18.028Z", 4, "NL00INGB0123456789", "deposit"));
+
+        // Check for correct Saving Goals
+        responseString = given().header("X-session-ID", sessionID).
+                get(Constants.PREFIX + "/savingGoals").
+                then().contentType(ContentType.JSON).extract().response().asString();
+        responseList = from(responseString).get("");
+        assertThat(responseList.size(), equalTo(3));
+        assertThat(responseList.get(0).get("id"), equalTo((int) pcSavingGoalID));
+        assertThat(responseList.get(0).get("balance"), equalTo((float) 300));
+        assertThat(responseList.get(1).get("id"), equalTo((int) carSavingGoalID));
+        assertThat(responseList.get(1).get("balance"), equalTo((float) 0));
+        assertThat(responseList.get(2).get("id"), equalTo((int) holidaySavingGoalID));
+        assertThat(responseList.get(2).get("balance"), equalTo((float) 85));
+
+        // JUN 2018
+        // Starting balance: 418 - 100 - 85 = 233
+        // Saving goals: PC = 400, Car = 0, Holiday = 170
+        RequestHelper.postTransaction(sessionID, new Transaction(
+                "2018-06-18T07:30:18.028Z", 1, "NL00INGB0123456789", "deposit"));
+
+        // Check for correct Saving Goals
+        responseString = given().header("X-session-ID", sessionID).
+                get(Constants.PREFIX + "/savingGoals").
+                then().contentType(ContentType.JSON).extract().response().asString();
+        responseList = from(responseString).get("");
+        assertThat(responseList.size(), equalTo(3));
+        assertThat(responseList.get(0).get("id"), equalTo((int) pcSavingGoalID));
+        assertThat(responseList.get(0).get("balance"), equalTo((float) 400));
+        assertThat(responseList.get(1).get("id"), equalTo((int) carSavingGoalID));
+        assertThat(responseList.get(1).get("balance"), equalTo((float) 0));
+        assertThat(responseList.get(2).get("id"), equalTo((int) holidaySavingGoalID));
+        assertThat(responseList.get(2).get("balance"), equalTo((float) 170));
+
+        // JUL 2018
+        // Starting balance: 234 - 100 - 85 = 49
+        // Saving goals: PC = 500, Car = 0, Holiday = 255
+        RequestHelper.postTransaction(sessionID, new Transaction(
+                "2018-07-18T07:30:18.028Z", 130, "NL00INGB0123456789", "deposit"));
+
+        // Check for correct Saving Goals
+        responseString = given().header("X-session-ID", sessionID).
+                get(Constants.PREFIX + "/savingGoals").
+                then().contentType(ContentType.JSON).extract().response().asString();
+        responseList = from(responseString).get("");
+        assertThat(responseList.size(), equalTo(3));
+        assertThat(responseList.get(0).get("id"), equalTo((int) pcSavingGoalID));
+        assertThat(responseList.get(0).get("balance"), equalTo((float) 500));
+        assertThat(responseList.get(1).get("id"), equalTo((int) carSavingGoalID));
+        assertThat(responseList.get(1).get("balance"), equalTo((float) 0));
+        assertThat(responseList.get(2).get("id"), equalTo((int) holidaySavingGoalID));
+        assertThat(responseList.get(2).get("balance"), equalTo((float) 255));
+
+        // AUG 2018
+        // Starting balance: 179 - 90 = 89
+        // Saving goals: PC = 590, Car = 0, Holiday = 255
+        RequestHelper.postTransaction(sessionID, new Transaction(
+                "2018-08-18T07:30:18.028Z", 1000, "NL00INGB0123456789", "deposit"));
+
+        // Check for correct Saving Goals
+        responseString = given().header("X-session-ID", sessionID).
+                get(Constants.PREFIX + "/savingGoals").
+                then().contentType(ContentType.JSON).extract().response().asString();
+        responseList = from(responseString).get("");
+        assertThat(responseList.size(), equalTo(3));
+        assertThat(responseList.get(0).get("id"), equalTo((int) pcSavingGoalID));
+        assertThat(responseList.get(0).get("balance"), equalTo((float) 590));
+        assertThat(responseList.get(1).get("id"), equalTo((int) carSavingGoalID));
+        assertThat(responseList.get(1).get("balance"), equalTo((float) 0));
+        assertThat(responseList.get(2).get("id"), equalTo((int) holidaySavingGoalID));
+        assertThat(responseList.get(2).get("balance"), equalTo((float) 255));
+
+        // SEP 2018
+        // Starting balance: 1089 - 250 - 85 = 754
+        // Saving goals: PC = 590, Car = 250, Holiday = 340
+        RequestHelper.postTransaction(sessionID, new Transaction(
+                "2018-09-18T07:30:18.028Z", 23, "NL00INGB0123456789", "deposit"));
+
+        // Check for correct Saving Goals
+        responseString = given().header("X-session-ID", sessionID).
+                get(Constants.PREFIX + "/savingGoals").
+                then().contentType(ContentType.JSON).extract().response().asString();
+        responseList = from(responseString).get("");
+        assertThat(responseList.size(), equalTo(3));
+        assertThat(responseList.get(0).get("id"), equalTo((int) pcSavingGoalID));
+        assertThat(responseList.get(0).get("balance"), equalTo((float) 590));
+        assertThat(responseList.get(1).get("id"), equalTo((int) carSavingGoalID));
+        assertThat(responseList.get(1).get("balance"), equalTo((float) 250));
+        assertThat(responseList.get(2).get("id"), equalTo((int) holidaySavingGoalID));
+        assertThat(responseList.get(2).get("balance"), equalTo((float) 340));
     }
 
 }
