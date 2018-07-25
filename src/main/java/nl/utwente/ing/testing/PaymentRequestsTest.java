@@ -28,13 +28,13 @@ public class PaymentRequestsTest {
         String newSessionID = RequestHelper.getNewSessionID();
         ArrayList<PaymentRequest> paymentRequests = new ArrayList<>();
         paymentRequests.add(new PaymentRequest("Food",
-                "2017-01-01T00:00:00.000Z", 5, 1, false));
+                "2017-01-01T00:00:00.000Z", 5, 1));
         paymentRequests.add(new PaymentRequest("Books",
-                "2017-01-02T00:00:00.000Z", 75, 2, false));
+                "2017-01-02T00:00:00.000Z", 75, 2));
         paymentRequests.add(new PaymentRequest("Beer",
-                "2017-01-03T00:00:00.000Z", 4, 4, false));
+                "2017-01-03T00:00:00.000Z", 4, 4));
         paymentRequests.add(new PaymentRequest("Stuff",
-                "2017-01-04T00:00:00.000Z", 15, 3, false));
+                "2017-01-04T00:00:00.000Z", 15, 3));
         for (PaymentRequest paymentRequest : paymentRequests) {
             RequestHelper.postPaymentRequest(newSessionID, paymentRequest);
         }
@@ -50,7 +50,7 @@ public class PaymentRequestsTest {
             assertThat(responseList.get(i).get("due_date"), equalTo(paymentRequests.get(i).getDue_date()));
             assertThat(responseList.get(i).get("amount"), equalTo(paymentRequests.get(i).getAmount()));
             assertThat(responseList.get(i).get("number_of_requests"), equalTo((int) paymentRequests.get(i).getNumber_of_requests()));
-            assertThat(responseList.get(i).get("filled"), equalTo(paymentRequests.get(i).getFilled()));
+            assertThat(responseList.get(i).get("filled"), equalTo(false));
         }
     }
 
@@ -58,7 +58,7 @@ public class PaymentRequestsTest {
     public void testPostPaymentRequestBasic() {
         String sessionID = RequestHelper.getNewSessionID();
         PaymentRequest paymentRequest = new PaymentRequest("Food",
-                "2017-01-01T00:00:00.000Z", 5, 1, false);
+                "2017-01-01T00:00:00.000Z", 5, 1);
 
         // Test invalid session ID status code
         given().contentType("application/json").
@@ -87,4 +87,5 @@ public class PaymentRequestsTest {
                 body(paymentRequest).header("X-session-ID", sessionID).
                 post(Constants.PREFIX + "/paymentRequests").then().statusCode(405);
     }
+
 }

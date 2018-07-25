@@ -14,8 +14,6 @@ public class PaymentRequest {
     private String due_date;
     private float amount;
     private long number_of_requests;
-    private boolean filled;
-    private List<Transaction> transactions;
 
     /**
      * An empty constructor of PaymentRequest.
@@ -32,14 +30,12 @@ public class PaymentRequest {
      * @param due_date           The due date of the to be created PaymentRequest.
      * @param amount             The amount of the to be created PaymentRequest.
      * @param number_of_requests The number of requests of the to be created PaymentRequest.
-     * @param filled             The boolean indicating whether the to be created PaymentRequest is already filled.
      */
-    public PaymentRequest(String description, String due_date, float amount, long number_of_requests, boolean filled) {
+    public PaymentRequest(String description, String due_date, float amount, long number_of_requests) {
         this.description = description;
         this.due_date = due_date;
         this.amount = amount;
         this.number_of_requests = number_of_requests;
-        this.filled = filled;
     }
 
     /**
@@ -112,42 +108,6 @@ public class PaymentRequest {
      */
     public void setNumber_of_requests(long number_of_requests) {
         this.number_of_requests = number_of_requests;
-    }
-
-    /**
-     * Method used to retrieve the boolean indicating whether this PaymentRequest is already filled.
-     *
-     * @return The boolean indicating whether this PaymentRequest is already filled.
-     */
-    public boolean getFilled() {
-        return filled;
-    }
-
-    /**
-     * Method used to update the boolean indicating whether this PaymentRequest is already filled.
-     *
-     * @param filled The new boolean indicating whether this PaymentRequest is already filled.
-     */
-    public void setFilled(boolean filled) {
-        this.filled = filled;
-    }
-
-    /**
-     * Method used to retrieve the list of Transactions that answered this PaymentRequest.
-     *
-     * @return The list of Transactions that answered this PaymentRequest.
-     */
-    public List<Transaction> getTransactions() {
-        return transactions;
-    }
-
-    /**
-     * Method used to update the list of Transactions that answered this PaymentRequest.
-     *
-     * @param transactions The new list of Transactions that answered this PaymentRequest.
-     */
-    public void setTransactions(List<Transaction> transactions) {
-        this.transactions = transactions;
     }
 
 }
