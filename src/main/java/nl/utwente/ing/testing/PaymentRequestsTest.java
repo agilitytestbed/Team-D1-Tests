@@ -157,7 +157,170 @@ public class PaymentRequestsTest {
 
         verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
     }
-    
+
+    @Test
+    public void testMultipleSingleAmountPaymentRequestsTransactions() {
+        ArrayList<Transaction> answeringTransactions1 = new ArrayList<>();
+        ArrayList<Transaction> answeringTransactions2 = new ArrayList<>();
+        String sessionID = RequestHelper.getNewSessionID();
+
+        PaymentRequest paymentRequest1 = new PaymentRequest("Dinner",
+                "2018-09-01T00:00:00.000Z", 10, 1);
+        long paymentRequestID1 = RequestHelper.postPaymentRequest(sessionID, paymentRequest1);
+
+        PaymentRequest paymentRequest2 = new PaymentRequest("Party",
+                "2018-09-01T00:00:00.000Z", 10, 3);
+        long paymentRequestID2 = RequestHelper.postPaymentRequest(sessionID, paymentRequest2);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t1 = new Transaction("2018-07-21T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t1);
+        answeringTransactions1.add(t1);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t2 = new Transaction("2018-07-22T12:34:56.789Z",
+                (float) 10.5, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t2);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t3 = new Transaction("2018-07-23T12:34:56.789Z",
+                10, "NL45INGB0123456789", "withdrawal");
+        RequestHelper.postTransaction(sessionID, t3);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t4 = new Transaction("2018-07-24T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t4);
+        answeringTransactions2.add(t4);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t5 = new Transaction("2018-07-25T12:34:56.789Z",
+                9, "NL45INGB0123456789", "withdrawal");
+        RequestHelper.postTransaction(sessionID, t5);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t6 = new Transaction("2018-07-26T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t6);
+        answeringTransactions2.add(t6);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t7 = new Transaction("2018-07-27T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t7);
+        answeringTransactions2.add(t7);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t8 = new Transaction("2018-07-28T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t8);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+    }
+
+    @Test
+    public void testMultipleDifferentAmountPaymentRequestsTransactions() {
+        ArrayList<Transaction> answeringTransactions1 = new ArrayList<>();
+        ArrayList<Transaction> answeringTransactions2 = new ArrayList<>();
+        String sessionID = RequestHelper.getNewSessionID();
+
+        PaymentRequest paymentRequest1 = new PaymentRequest("Dinner",
+                "2018-09-01T00:00:00.000Z", 10, 2);
+        long paymentRequestID1 = RequestHelper.postPaymentRequest(sessionID, paymentRequest1);
+
+        PaymentRequest paymentRequest2 = new PaymentRequest("Party",
+                "2018-09-01T00:00:00.000Z", 15, 2);
+        long paymentRequestID2 = RequestHelper.postPaymentRequest(sessionID, paymentRequest2);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t1 = new Transaction("2018-07-21T12:34:56.789Z",
+                15, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t1);
+        answeringTransactions2.add(t1);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t2 = new Transaction("2018-07-22T12:34:56.789Z",
+                (float) 10.5, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t2);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t3 = new Transaction("2018-07-23T12:34:56.789Z",
+                10, "NL45INGB0123456789", "withdrawal");
+        RequestHelper.postTransaction(sessionID, t3);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t4 = new Transaction("2018-07-24T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t4);
+        answeringTransactions1.add(t4);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t5 = new Transaction("2018-07-25T12:34:56.789Z",
+                9, "NL45INGB0123456789", "withdrawal");
+        RequestHelper.postTransaction(sessionID, t5);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t6 = new Transaction("2018-07-26T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t6);
+        answeringTransactions1.add(t6);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t7 = new Transaction("2018-07-27T12:34:56.789Z",
+                15, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t7);
+        answeringTransactions2.add(t7);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t8 = new Transaction("2018-07-28T12:34:56.789Z",
+                15, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t8);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+
+        Transaction t9 = new Transaction("2018-07-29T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t9);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
+        verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+    }
+
     private void verifyPaymentRequestResponse(String sessionID, long paymentRequestID, PaymentRequest paymentRequest,
                                              ArrayList<Transaction> answeringTransactions) {
         String responseString = given().header("X-session-ID", sessionID).
