@@ -2,8 +2,10 @@ package nl.utwente.ing.testing;
 
 import io.restassured.http.ContentType;
 import nl.utwente.ing.testing.bean.PaymentRequest;
+import nl.utwente.ing.testing.bean.Transaction;
 import nl.utwente.ing.testing.helper.Constants;
 import nl.utwente.ing.testing.helper.RequestHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -12,6 +14,8 @@ import java.util.Map;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static io.restassured.path.json.JsonPath.from;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasKey;
@@ -51,6 +55,7 @@ public class PaymentRequestsTest {
             assertThat(responseList.get(i).get("amount"), equalTo(paymentRequests.get(i).getAmount()));
             assertThat(responseList.get(i).get("number_of_requests"), equalTo((int) paymentRequests.get(i).getNumber_of_requests()));
             assertThat(responseList.get(i).get("filled"), equalTo(false));
+            assertThat(responseList.get(i), hasKey("transactions"));
         }
     }
 
@@ -86,6 +91,93 @@ public class PaymentRequestsTest {
         given().contentType("application/json").
                 body(paymentRequest).header("X-session-ID", sessionID).
                 post(Constants.PREFIX + "/paymentRequests").then().statusCode(405);
+    }
+
+    @Test
+    public void testSinglePaymentRequestTransactions() {
+        ArrayList<Transaction> answeringTransactions = new ArrayList<>();
+        String sessionID = RequestHelper.getNewSessionID();
+
+        PaymentRequest paymentRequest = new PaymentRequest("Dinner",
+                "2018-09-01T00:00:00.000Z", 10, 4);
+        long paymentRequestID = RequestHelper.postPaymentRequest(sessionID, paymentRequest);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t1 = new Transaction("2018-07-21T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t1);
+        answeringTransactions.add(t1);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t2 = new Transaction("2018-07-22T12:34:56.789Z",
+                (float) 10.5, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t2);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t3 = new Transaction("2018-07-23T12:34:56.789Z",
+                10, "NL45INGB0123456789", "withdrawal");
+        RequestHelper.postTransaction(sessionID, t3);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t4 = new Transaction("2018-07-24T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t4);
+        answeringTransactions.add(t4);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t5 = new Transaction("2018-07-25T12:34:56.789Z",
+                9, "NL45INGB0123456789", "withdrawal");
+        RequestHelper.postTransaction(sessionID, t5);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t6 = new Transaction("2018-07-26T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t6);
+        answeringTransactions.add(t6);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t7 = new Transaction("2018-07-27T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t7);
+        answeringTransactions.add(t7);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t8 = new Transaction("2018-07-28T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t8);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+    }
+
+    public void verifyPaymentRequestResponse(String sessionID, long paymentRequestID, PaymentRequest paymentRequest,
+                                             ArrayList<Transaction> answeringTransactions) {
+        String responseString = given().header("X-session-ID", sessionID).
+                get(Constants.PREFIX + "/paymentRequests").
+                then().statusCode(200).contentType(ContentType.JSON).extract().response().asString();
+        ArrayList<Map<String, ?>> responseList = from(responseString).get("");
+        assertThat(responseList.size(), equalTo(1));
+        boolean shouldBeFilled = answeringTransactions.size() == paymentRequest.getNumber_of_requests();
+        assertThat(responseList.get(0).get("id"), equalTo((int) paymentRequestID));
+        assertThat(responseList.get(0).get("description"), equalTo(paymentRequest.getDescription()));
+        assertThat(responseList.get(0).get("due_date"), equalTo(paymentRequest.getDue_date()));
+        assertThat(responseList.get(0).get("amount"), equalTo(paymentRequest.getAmount()));
+        assertThat(responseList.get(0).get("number_of_requests"), equalTo((int) paymentRequest.getNumber_of_requests()));
+        assertThat(responseList.get(0).get("filled"), equalTo(shouldBeFilled));
+        assertThat(responseList.get(0), hasKey("transactions"));
+
+        String innerResponseString = responseList.get(0).get("transactions").toString();
+        assertEquals(answeringTransactions.size(), StringUtils.countMatches(innerResponseString, '{'));
+        for (Transaction transaction : answeringTransactions) {
+            assertTrue(innerResponseString.contains(transaction.getDate()));
+        }
     }
 
 }
