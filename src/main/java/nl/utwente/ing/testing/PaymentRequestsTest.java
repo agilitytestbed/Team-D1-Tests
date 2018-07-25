@@ -78,7 +78,8 @@ public class PaymentRequestsTest {
                 body("due_date", equalTo("2017-01-01T00:00:00.000Z")).
                 body("amount", equalTo((float) 5)).
                 body("number_of_requests", equalTo(1)).
-                body("filled", equalTo(false));
+                body("filled", equalTo(false)).
+                body("$", hasKey("transactions"));
 
         // Test invalid input status code
         paymentRequest.setNumber_of_requests(-1);
