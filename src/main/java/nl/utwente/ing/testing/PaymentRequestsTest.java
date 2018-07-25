@@ -16,6 +16,7 @@ import static io.restassured.RestAssured.when;
 import static io.restassured.path.json.JsonPath.from;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.fail;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasKey;
@@ -156,27 +157,36 @@ public class PaymentRequestsTest {
 
         verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
     }
-
-    public void verifyPaymentRequestResponse(String sessionID, long paymentRequestID, PaymentRequest paymentRequest,
+    
+    private void verifyPaymentRequestResponse(String sessionID, long paymentRequestID, PaymentRequest paymentRequest,
                                              ArrayList<Transaction> answeringTransactions) {
         String responseString = given().header("X-session-ID", sessionID).
                 get(Constants.PREFIX + "/paymentRequests").
                 then().statusCode(200).contentType(ContentType.JSON).extract().response().asString();
         ArrayList<Map<String, ?>> responseList = from(responseString).get("");
-        assertThat(responseList.size(), equalTo(1));
         boolean shouldBeFilled = answeringTransactions.size() == paymentRequest.getNumber_of_requests();
-        assertThat(responseList.get(0).get("id"), equalTo((int) paymentRequestID));
-        assertThat(responseList.get(0).get("description"), equalTo(paymentRequest.getDescription()));
-        assertThat(responseList.get(0).get("due_date"), equalTo(paymentRequest.getDue_date()));
-        assertThat(responseList.get(0).get("amount"), equalTo(paymentRequest.getAmount()));
-        assertThat(responseList.get(0).get("number_of_requests"), equalTo((int) paymentRequest.getNumber_of_requests()));
-        assertThat(responseList.get(0).get("filled"), equalTo(shouldBeFilled));
-        assertThat(responseList.get(0), hasKey("transactions"));
+        boolean shouldFail = true;
+        for (int i = 0; i < responseList.size(); i++) {
+            if (responseList.get(i).get("id").toString().equals(Long.toString(paymentRequestID))) {
+                assertThat(responseList.get(i).get("id"), equalTo((int) paymentRequestID));
+                assertThat(responseList.get(i).get("description"), equalTo(paymentRequest.getDescription()));
+                assertThat(responseList.get(i).get("due_date"), equalTo(paymentRequest.getDue_date()));
+                assertThat(responseList.get(i).get("amount"), equalTo(paymentRequest.getAmount()));
+                assertThat(responseList.get(i).get("number_of_requests"), equalTo((int) paymentRequest.getNumber_of_requests()));
+                assertThat(responseList.get(i).get("filled"), equalTo(shouldBeFilled));
+                assertThat(responseList.get(i), hasKey("transactions"));
 
-        String innerResponseString = responseList.get(0).get("transactions").toString();
-        assertEquals(answeringTransactions.size(), StringUtils.countMatches(innerResponseString, '{'));
-        for (Transaction transaction : answeringTransactions) {
-            assertTrue(innerResponseString.contains(transaction.getDate()));
+                String innerResponseString = responseList.get(i).get("transactions").toString();
+                assertEquals(answeringTransactions.size(), StringUtils.countMatches(innerResponseString, '{'));
+                for (Transaction transaction : answeringTransactions) {
+                    assertTrue(innerResponseString.contains(transaction.getDate()));
+                }
+                shouldFail = false;
+            }
+        }
+
+        if (shouldFail) {
+            fail();
         }
     }
 
