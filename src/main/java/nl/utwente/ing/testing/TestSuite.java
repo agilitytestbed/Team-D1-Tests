@@ -9,7 +9,8 @@ import org.junit.runners.Suite.SuiteClasses;
         InitialSystemTest.class,
         CategoryRulesTest.class,
         BalanceHistoryTest.class,
-        SavingGoalsTest.class
+        SavingGoalsTest.class,
+        PaymentRequestsTest.class
 })
 public class TestSuite {
 
