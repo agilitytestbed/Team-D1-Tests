@@ -1,6 +1,7 @@
 package nl.utwente.ing.testing;
 
 import io.restassured.http.ContentType;
+import nl.utwente.ing.testing.bean.Category;
 import nl.utwente.ing.testing.bean.PaymentRequest;
 import nl.utwente.ing.testing.bean.Transaction;
 import nl.utwente.ing.testing.helper.Constants;
@@ -319,6 +320,161 @@ public class PaymentRequestsTest {
 
         verifyPaymentRequestResponse(sessionID, paymentRequestID1, paymentRequest1, answeringTransactions1);
         verifyPaymentRequestResponse(sessionID, paymentRequestID2, paymentRequest2, answeringTransactions2);
+    }
+
+    @Test
+    public void testPaymentRequestTransactionsAfterDueDateFilled() {
+        ArrayList<Transaction> answeringTransactions = new ArrayList<>();
+        String sessionID = RequestHelper.getNewSessionID();
+
+        PaymentRequest paymentRequest = new PaymentRequest("Dinner",
+                "2018-07-28T12:00:00.000Z", 10, 4);
+        long paymentRequestID = RequestHelper.postPaymentRequest(sessionID, paymentRequest);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t1 = new Transaction("2018-07-21T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t1);
+        answeringTransactions.add(t1);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t2 = new Transaction("2018-07-22T12:34:56.789Z",
+                (float) 10.5, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t2);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t3 = new Transaction("2018-07-23T12:34:56.789Z",
+                10, "NL45INGB0123456789", "withdrawal");
+        RequestHelper.postTransaction(sessionID, t3);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t4 = new Transaction("2018-07-24T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t4);
+        answeringTransactions.add(t4);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t5 = new Transaction("2018-07-25T12:34:56.789Z",
+                9, "NL45INGB0123456789", "withdrawal");
+        RequestHelper.postTransaction(sessionID, t5);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t6 = new Transaction("2018-07-26T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t6);
+        answeringTransactions.add(t6);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t7 = new Transaction("2018-07-27T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t7);
+        answeringTransactions.add(t7);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t8 = new Transaction("2018-07-28T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t8);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+    }
+
+    @Test
+    public void testPaymentRequestTransactionsAfterDueDateNotFilled() {
+        ArrayList<Transaction> answeringTransactions = new ArrayList<>();
+        String sessionID = RequestHelper.getNewSessionID();
+
+        PaymentRequest paymentRequest = new PaymentRequest("Dinner",
+                "2018-07-27T12:00:00.000Z", 10, 4);
+        long paymentRequestID = RequestHelper.postPaymentRequest(sessionID, paymentRequest);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t1 = new Transaction("2018-07-21T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t1);
+        answeringTransactions.add(t1);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t2 = new Transaction("2018-07-22T12:34:56.789Z",
+                (float) 10.5, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t2);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t3 = new Transaction("2018-07-23T12:34:56.789Z",
+                10, "NL45INGB0123456789", "withdrawal");
+        RequestHelper.postTransaction(sessionID, t3);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t4 = new Transaction("2018-07-24T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t4);
+        answeringTransactions.add(t4);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t5 = new Transaction("2018-07-25T12:34:56.789Z",
+                9, "NL45INGB0123456789", "withdrawal");
+        RequestHelper.postTransaction(sessionID, t5);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t6 = new Transaction("2018-07-26T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t6);
+        answeringTransactions.add(t6);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t7 = new Transaction("2018-07-27T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t7);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t8 = new Transaction("2018-07-28T12:34:56.789Z",
+                10, "NL45INGB0123456789", "deposit");
+        RequestHelper.postTransaction(sessionID, t8);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+    }
+
+    @Test
+    public void testCategoryInPaymentRequestTransaction() {
+        ArrayList<Transaction> answeringTransactions = new ArrayList<>();
+        String sessionID = RequestHelper.getNewSessionID();
+
+        PaymentRequest paymentRequest = new PaymentRequest("Paint",
+                "2018-09-01T00:00:00.000Z", 95, 1);
+        long paymentRequestID = RequestHelper.postPaymentRequest(sessionID, paymentRequest);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        Transaction t1 = new Transaction("2018-07-21T12:34:56.789Z",
+                95, "NL45INGB0123456789", "deposit");
+        long transactionID = RequestHelper.postTransaction(sessionID, t1);
+        answeringTransactions.add(t1);
+
+        verifyPaymentRequestResponse(sessionID, paymentRequestID, paymentRequest, answeringTransactions);
+
+        long categoryID = RequestHelper.postCategory(sessionID, new Category("Creativity"));
+        RequestHelper.assignCategoryToTransaction(sessionID, transactionID, categoryID);
+
+        String responseString = given().header("X-session-ID", sessionID).
+                get(Constants.PREFIX + "/paymentRequests").
+                then().statusCode(200).contentType(ContentType.JSON).extract().response().asString();
+        assertTrue(responseString.contains("\"category\":{"));
+        assertTrue(responseString.contains("\"name\":\"Creativity\""));
     }
 
     private void verifyPaymentRequestResponse(String sessionID, long paymentRequestID, PaymentRequest paymentRequest,
