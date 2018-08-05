@@ -26,7 +26,10 @@ public class BalanceHistoryTest {
         String sessionID = RequestHelper.getNewSessionID();
 
         // Test valid application workflow
-        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusHours(1);
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC);
+        RequestHelper.postTransaction(sessionID, new Transaction(IntervalHelper.dateToString(localDateTime), 1,
+                "NL42INGB0123456789", "deposit"));
+        localDateTime = localDateTime.minusHours(1);
         localDateTime = localDateTime.minusMonths(24);
         ArrayList<Transaction> transactions = new ArrayList<>();
 
@@ -84,13 +87,19 @@ public class BalanceHistoryTest {
         assertThat((Float) responseList.get(16).get("low"), equalTo((float) 200));
         assertThat((Float) responseList.get(16).get("volume"), equalTo((float) 3025));
 
-        for (int i = 17; i <= 23; i++) {
+        for (int i = 17; i <= 22; i++) {
             assertThat((Float) responseList.get(i).get("open"), equalTo((float) 2725));
             assertThat((Float) responseList.get(i).get("close"), equalTo((float) 2725));
             assertThat((Float) responseList.get(i).get("high"), equalTo((float) 2725));
             assertThat((Float) responseList.get(i).get("low"), equalTo((float) 2725));
             assertThat((Float) responseList.get(i).get("volume"), equalTo((float) 0));
         }
+
+        assertThat((Float) responseList.get(23).get("open"), equalTo((float) 2725));
+        assertThat((Float) responseList.get(23).get("close"), equalTo((float) 2726));
+        assertThat((Float) responseList.get(23).get("high"), equalTo((float) 2726));
+        assertThat((Float) responseList.get(23).get("low"), equalTo((float) 2725));
+        assertThat((Float) responseList.get(23).get("volume"), equalTo((float) 1));
     }
 
     @Test
@@ -99,7 +108,10 @@ public class BalanceHistoryTest {
         String sessionID = RequestHelper.getNewSessionID();
 
         // Test valid application workflow
-        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusHours(1);
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC);
+        RequestHelper.postTransaction(sessionID, new Transaction(IntervalHelper.dateToString(localDateTime), 1,
+                "NL42INGB0123456789", "deposit"));
+        localDateTime = localDateTime.minusHours(1);
         localDateTime = localDateTime.minusMonths(1);
         ArrayList<Transaction> transactions = new ArrayList<>();
 
@@ -136,10 +148,10 @@ public class BalanceHistoryTest {
         assertThat((Float) responseList.get(0).get("volume"), equalTo((float) 1300));
 
         assertThat((Float) responseList.get(1).get("open"), equalTo((float) 700));
-        assertThat((Float) responseList.get(1).get("close"), equalTo((float) 2725));
-        assertThat((Float) responseList.get(1).get("high"), equalTo((float) 2725));
+        assertThat((Float) responseList.get(1).get("close"), equalTo((float) 2726));
+        assertThat((Float) responseList.get(1).get("high"), equalTo((float) 2726));
         assertThat((Float) responseList.get(1).get("low"), equalTo((float) 200));
-        assertThat((Float) responseList.get(1).get("volume"), equalTo((float) 3025));
+        assertThat((Float) responseList.get(1).get("volume"), equalTo((float) 3026));
     }
 
     @Test
@@ -148,7 +160,10 @@ public class BalanceHistoryTest {
         String sessionID = RequestHelper.getNewSessionID();
 
         // Test valid application workflow
-        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusWeeks(1);
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC);
+        RequestHelper.postTransaction(sessionID, new Transaction(IntervalHelper.dateToString(localDateTime), 1,
+                "NL42INGB0123456789", "deposit"));
+        localDateTime = localDateTime.minusWeeks(1);
         localDateTime = localDateTime.minusMonths(3);
         ArrayList<Transaction> transactions = new ArrayList<>();
 
@@ -179,10 +194,10 @@ public class BalanceHistoryTest {
         assertThat(responseList.size(), equalTo(1));
 
         assertThat((Float) responseList.get(0).get("open"), equalTo((float) 2725));
-        assertThat((Float) responseList.get(0).get("close"), equalTo((float) 2725));
-        assertThat((Float) responseList.get(0).get("high"), equalTo((float) 2725));
+        assertThat((Float) responseList.get(0).get("close"), equalTo((float) 2726));
+        assertThat((Float) responseList.get(0).get("high"), equalTo((float) 2726));
         assertThat((Float) responseList.get(0).get("low"), equalTo((float) 2725));
-        assertThat((Float) responseList.get(0).get("volume"), equalTo((float) 0));
+        assertThat((Float) responseList.get(0).get("volume"), equalTo((float) 1));
     }
 
     @Test
@@ -206,7 +221,10 @@ public class BalanceHistoryTest {
         String sessionID = RequestHelper.getNewSessionID();
 
         // Test valid application workflow
-        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(1);
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC);
+        RequestHelper.postTransaction(sessionID, new Transaction(IntervalHelper.dateToString(localDateTime), 1,
+                "NL42INGB0123456789", "deposit"));
+        localDateTime = localDateTime.minusMinutes(1);
         localDateTime = localDateTime.minusHours(4);
         ArrayList<Transaction> transactions = new ArrayList<>();
 
@@ -244,7 +262,10 @@ public class BalanceHistoryTest {
         String sessionID = RequestHelper.getNewSessionID();
 
         // Test valid application workflow
-        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(1);
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC);
+        RequestHelper.postTransaction(sessionID, new Transaction(IntervalHelper.dateToString(localDateTime), 1,
+                "NL42INGB0123456789", "deposit"));
+        localDateTime = localDateTime.minusMinutes(1);
         localDateTime = localDateTime.minusDays(4);
         ArrayList<Transaction> transactions = new ArrayList<>();
 
@@ -282,7 +303,10 @@ public class BalanceHistoryTest {
         String sessionID = RequestHelper.getNewSessionID();
 
         // Test valid application workflow
-        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(1);
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC);
+        RequestHelper.postTransaction(sessionID, new Transaction(IntervalHelper.dateToString(localDateTime), 1,
+                "NL42INGB0123456789", "deposit"));
+        localDateTime = localDateTime.minusMinutes(1);
         localDateTime = localDateTime.minusWeeks(4);
         ArrayList<Transaction> transactions = new ArrayList<>();
 
@@ -320,7 +344,10 @@ public class BalanceHistoryTest {
         String sessionID = RequestHelper.getNewSessionID();
 
         // Test valid application workflow
-        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(1);
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC);
+        RequestHelper.postTransaction(sessionID, new Transaction(IntervalHelper.dateToString(localDateTime), 1,
+                "NL42INGB0123456789", "deposit"));
+        localDateTime = localDateTime.minusMinutes(1);
         localDateTime = localDateTime.minusMonths(4);
         ArrayList<Transaction> transactions = new ArrayList<>();
 
@@ -358,7 +385,10 @@ public class BalanceHistoryTest {
         String sessionID = RequestHelper.getNewSessionID();
 
         // Test valid application workflow
-        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusMinutes(1);
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC);
+        RequestHelper.postTransaction(sessionID, new Transaction(IntervalHelper.dateToString(localDateTime), 1,
+                "NL42INGB0123456789", "deposit"));
+        localDateTime = localDateTime.minusMinutes(1);
         localDateTime = localDateTime.minusYears(4);
         ArrayList<Transaction> transactions = new ArrayList<>();
 
@@ -420,10 +450,10 @@ public class BalanceHistoryTest {
         assertThat((Float) responseList.get(3).get("volume"), equalTo((float) 3025));
 
         assertThat((Float) responseList.get(4).get("open"), equalTo((float) 2725));
-        assertThat((Float) responseList.get(4).get("close"), equalTo((float) 2725));
-        assertThat((Float) responseList.get(4).get("high"), equalTo((float) 2725));
+        assertThat((Float) responseList.get(4).get("close"), equalTo((float) 2726));
+        assertThat((Float) responseList.get(4).get("high"), equalTo((float) 2726));
         assertThat((Float) responseList.get(4).get("low"), equalTo((float) 2725));
-        assertThat((Float) responseList.get(4).get("volume"), equalTo((float) 0));
+        assertThat((Float) responseList.get(4).get("volume"), equalTo((float) 1));
     }
 
 }
