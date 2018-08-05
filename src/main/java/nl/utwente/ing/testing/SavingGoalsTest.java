@@ -408,7 +408,8 @@ public class SavingGoalsTest {
     public void testCorrectBalanceHistoryAfterGoalDeletion() {
         String sessionID = RequestHelper.getNewSessionID();
 
-        LocalDateTime localDateTime = LocalDateTime.now(ZoneOffset.UTC).minusMonths(9).minusHours(1);
+        LocalDateTime localDateTimeNow = LocalDateTime.now(ZoneOffset.UTC);
+        LocalDateTime localDateTime = localDateTimeNow.minusMonths(9).minusHours(1);
 
         // JAN 2018
         // Starting balance: 0
@@ -485,6 +486,9 @@ public class SavingGoalsTest {
         RequestHelper.postTransaction(sessionID, new Transaction(
                 IntervalHelper.dateToString(localDateTime), 23, "NL00INGB0123456789", "deposit"));
 
+        RequestHelper.postTransaction(sessionID, new Transaction(IntervalHelper.dateToString(localDateTimeNow), 1,
+                "NL42INGB0123456789", "deposit"));
+
         String responseString = given().header("X-session-ID", sessionID).
                 queryParam("interval", "month").queryParam("intervals", 10).
                 get(Constants.PREFIX + "/balance/history").
@@ -547,10 +551,10 @@ public class SavingGoalsTest {
         assertThat((Float) responseList.get(8).get("volume"), equalTo((float) 1680));
 
         assertThat((Float) responseList.get(9).get("open"), equalTo((float) 1679));
-        assertThat((Float) responseList.get(9).get("close"), equalTo((float) 1367));
+        assertThat((Float) responseList.get(9).get("close"), equalTo((float) 1368));
         assertThat((Float) responseList.get(9).get("high"), equalTo((float) 1679));
         assertThat((Float) responseList.get(9).get("low"), equalTo((float) 1344));
-        assertThat((Float) responseList.get(9).get("volume"), equalTo((float) 358));
+        assertThat((Float) responseList.get(9).get("volume"), equalTo((float) 359));
     }
 
     private void useReusableData(String sessionID) {
