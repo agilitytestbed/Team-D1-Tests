@@ -11,7 +11,8 @@ import org.junit.runners.Suite.SuiteClasses;
         BalanceHistoryTest.class,
         SavingGoalsTest.class,
         PaymentRequestsTest.class,
-        UserMessagesTest.class
+        UserMessagesTest.class,
+        MessageRulesTest.class
 })
 public class TestSuite {
 
