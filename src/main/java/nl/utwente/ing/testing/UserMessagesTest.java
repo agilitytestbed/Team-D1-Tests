@@ -523,7 +523,7 @@ public class UserMessagesTest {
         verifyUserMessages(sessionID, expectedMessages);
     }
 
-    private void verifyUserMessages(String sessionID, ArrayList<UserMessage> expectedMessages) {
+    protected static void verifyUserMessages(String sessionID, ArrayList<UserMessage> expectedMessages) {
         String responseString = given().header("X-session-ID", sessionID).
                 get(Constants.PREFIX + "/messages").
                 then().statusCode(200).contentType(ContentType.JSON).extract().response().asString();
